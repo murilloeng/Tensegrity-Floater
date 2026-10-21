@@ -3,10 +3,10 @@
 	"configurations":
 	[
 		{
-			"name": "gdb",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/dist/debug/tensegrity.out",
+			"name": "gdb - debug",
+			"program": "${workspaceFolder}/dist/debug/tensegrity-plate.out",
 			"args": [],
 			"MIMode": "gdb",
 			"environment": [],
@@ -23,15 +23,24 @@
 			]
 		},
 		{
-			"name": "msvc",
-			"type": "cppvsdbg",
+			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/dist/x64/Debug/Tensegrity.exe",
+			"name": "gdb - release",
+			"program": "${workspaceFolder}/dist/release/tensegrity-plate.out",
 			"args": [],
+			"MIMode": "gdb",
 			"environment": [],
 			"stopAtEntry": false,
+			"externalConsole": false,
 			"cwd": "${workspaceFolder}",
-			"console": "integratedTerminal"
+			"setupCommands":
+			[
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			]
 		}
 	]
 }

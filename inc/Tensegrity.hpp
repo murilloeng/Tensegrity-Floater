@@ -1,21 +1,12 @@
 #pragma once
 
-//std
-#include <functional>
+//Math
+#include "Math/inc/Groups/GSE3.hpp"
+#include "Math/inc/Solvers/Newmark.hpp"
+#include "Math/inc/Solvers/NewtonRaphson.hpp"
 
-//math
-#include "Math/inc/linear/vec3.hpp"
-#include "Math/inc/linear/quat.hpp"
-#include "Math/inc/linear/mat3.hpp"
-
-//tensegrity
-#include "Tensegrity/inc/Strain.hpp"
-
-class Solver;
-namespace canvas
-{
-	class Scene;
-}
+//Tensegrity
+#include "Tensegrity-Plate/inc/Strain.hpp"
 
 class Tensegrity
 {
@@ -27,19 +18,14 @@ public:
 	~Tensegrity(void);
 
 	//data
-	Solver* solver(void) const;
-
 	double tension(double);
 	double tension(void) const;
 
-	uint32_t cables(uint32_t);
-	uint32_t cables(void) const;
+	uint32_t order(uint32_t);
+	uint32_t order(void) const;
 
 	double rod_length(double);
 	double rod_length(void) const;
-
-	const char* label(void) const;
-	const char* label(const char*);
 
 	double twist_angle(double);
 	double twist_angle(void) const;
@@ -74,61 +60,39 @@ public:
 	Strain::strain_measure strain_measure(void) const;
 	Strain::strain_measure strain_measure(Strain::strain_measure);
 
-	//draw
-	void show(int32_t&, char**);
-	void draw_model(canvas::Scene*) const;
-	void draw_deformed(canvas::Scene*, uint32_t) const;
-
-	//loads
-	void remove_load(uint32_t);
-	void add_load(math::vec3, math::vec3);
-	
-	void load(uint32_t, math::vec3);
-	void load_position(uint32_t, math::vec3);
-	const std::vector<math::vec3>& loads(void) const;
-	const std::vector<math::vec3>& loads_position(void) const;
-
 	//formulation
-	void modes(void) const;
-	double cable_force(uint32_t) const;
+	void inertia(double*) const;
+	void damping(double*) const;
+	void stiffness(double*) const;
+	void internal_force(double*) const;
+	void external_force(double*) const;
 
+	double kinetic_energy(void) const;
 	double internal_energy(void) const;
 	double potential_energy(void) const;
-	
-	void stiffness(math::matrix&) const;
-	
-	void internal_force(math::vector&) const;
-	void external_force(math::vector&) const;
 
-	//operators
-	Tensegrity& operator=(const Tensegrity&);
+	double cable_force(uint32_t) const;
+	double cable_stiffness(uint32_t) const;
 
 private:
-	//friends
-	friend class Solver;
-
-	//position
-	math::vec3 position(uint32_t, bool, bool) const;
-
 	//data
-	uint32_t m_nc;
+	uint32_t m_order;
 	bool m_inelastic;
-	char m_label[200];
 	double m_rod_length;
 	double m_twist_angle;
-	double m_rod_thicknes;
 	double m_yield_stress;
 	double m_height_total;
 	double m_height_center;
+	double m_rod_thickness;
 	double m_plate_diameter;
 	double m_plate_thickness;
 	double m_cables_diameter;
 	double m_residual_stress;
 	double m_elastic_modulus;
 
-	std::vector<math::vec3> m_ak;
-	std::vector<math::vec3> m_pk;
-
-	Solver* m_solver;
+	math::GSE3 m_state_old;
+	math::GSE3 m_state_new;
 	Strain::strain_measure m_strain_measure;
+	math::solvers::Newmark m_solver_dynamic;
+	math::solvers::NewtonRaphson m_solver_static;
 };

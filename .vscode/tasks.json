@@ -7,14 +7,7 @@
 			"type": "shell",
 			"label": "make",
 			"group": "build",
-			"linux" : 
-			{
-				"command": "make ${input:make}"
-			},
-			"windows" : 
-			{
-				"command": "msbuild ${input:msbuild}"
-			},
+			"command": "make ${input:make}",
 			"presentation": 
 			{
 				"echo": false,
@@ -29,7 +22,7 @@
 			"type": "shell",
 			"group": "build",
 			"label": "gnuplot",
-			"command": "gnuplot -p -e ${input:gnuplot 1} -e ${input:gnuplot 2} ${file}",
+			"command": "gnuplot -p ${file}",
 			"presentation": 
 			{
 				"echo": true,
@@ -46,32 +39,6 @@
 			"default": "run m=r",
 			"type": "promptString",
 			"description": "Make:"
-		},
-		{
-			"id": "msbuild",
-			"type": "pickString",
-			"description": "MSBuild:",
-			"options": 
-			[
-				"/property:Configuration=Debug", 
-				"/property:Configuration=Release", 
-				"/property:Configuration=Debug /target:Clean", 
-				"/property:Configuration=Release /target:Clean", 
-				"/property:Configuration=Debug; dist/x64/Debug/Tensegrity.exe", 
-				"/property:Configuration=Release; dist/x64/Release/Tensegrity.exe"
-			]
-		},
-		{
-			"id": "gnuplot 1",
-			"default": "index_1=1",
-			"type": "promptString",
-			"description": "gnuplot index 1:"
-		},
-		{
-			"id": "gnuplot 2",
-			"default": "index_2=1",
-			"type": "promptString",
-			"description": "gnuplot index 2:"
-		},
+		}
 	]
 }

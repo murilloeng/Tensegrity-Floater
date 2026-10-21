@@ -1,16 +1,6 @@
 *
 !*/
-!*.md
-!*.ui
 !*.gp
-!*.py
-!*.bat
 !*.cpp
 !*.hpp
-!*.sln
-!*.ps1
-!Makefile
-!*.vcxproj
 !.gitignore
-!.vscode/*.json
-build/uic/*.hpp

@@ -1,51 +1,49 @@
 //std
 #include <cmath>
 
-//tensegrity
-#include "Tensegrity/inc/Strain.hpp"
+//Tensegrity
+#include "Tensegrity-Plate/inc/Strain.hpp"
 
 double Strain::strain(double s, strain_measure measure)
 {
-	if(measure == strain_measure::quadratic)
-	{
-		return quadratic_strain(s);
-	}
-	if(measure == strain_measure::logarithmic)
-	{
-		return logarithmic_strain(s);
-	}
-	return 0;
+	double (*methods[])(double) = {
+		linear_strain, quadratic_strain, logarithmic_strain
+	};
+	return methods[uint32_t(measure)](s);
 }
 double Strain::strain_hessian(double s, strain_measure measure)
 {
-	if(measure == strain_measure::quadratic)
-	{
-		return quadratic_strain_hessian(s);
-	}
-	if(measure == strain_measure::logarithmic)
-	{
-		return logarithmic_strain_hessian(s);
-	}
-	return 0;
+	double (*methods[])(double) = {
+		linear_strain_hessian, quadratic_strain_hessian, logarithmic_strain_hessian
+	};
+	return methods[uint32_t(measure)](s);
 }
 double Strain::strain_gradient(double s, strain_measure measure)
 {
-	if(measure == strain_measure::quadratic)
-	{
-		return quadratic_strain_gradient(s);
-	}
-	if(measure == strain_measure::logarithmic)
-	{
-		return logarithmic_strain_gradient(s);
-	}
+	double (*methods[])(double) = {
+		linear_strain_gradient, quadratic_strain_gradient, logarithmic_strain_gradient
+	};
+	return methods[uint32_t(measure)](s);
+}
+
+double Strain::linear_strain(double s)
+{
+	return s - 1;
+}
+double Strain::linear_strain_hessian(double)
+{
 	return 0;
+}
+double Strain::linear_strain_gradient(double)
+{
+	return 1;
 }
 
 double Strain::quadratic_strain(double s)
 {
 	return (s * s - 1) / 2;
 }
-double Strain::quadratic_strain_hessian(double s)
+double Strain::quadratic_strain_hessian(double)
 {
 	return 1;
 }

@@ -1,17 +1,8 @@
-#qt
-qln = $(QT_HOME)/lib
-qin = $(QT_HOME)/include
-uic = $(QT_HOME)/libexec/uic
-qde = $(QT_HOME)/mkspecs/linux-g++
-
 #compiler
 CXX = g++
-LIBS += -L $(qln)
-WARS += -Wall -Wno-unused-variable -Wno-unused-result
-INCS += -I .. -I ../external/cpp/inc -I $(qde) -I $(qin)
-LIBS += -l lapack -l quadrule -l GLEW -l GL -l glut -l freetype
-LIBS += -l Qt6Core -l Qt6Gui -l Qt6Widgets -l Qt6OpenGL -l Qt6OpenGLWidgets
-WARS += -Wno-format-security -Wno-return-type -Wno-unused-function -Wformat-overflow=0
+INCS += -I ..
+WARS += -Wall
+LIBS += -l openblas -l arpack -l umfpack -l quadrule -l fftw3
 CXXFLAGS += -std=c++20 -fPIC -pipe -fopenmp -MT $@ -MMD -MP -MF $(subst .o,.d, $@) $(DEFS) $(INCS) $(WARS)
 
 #mode
@@ -24,16 +15,10 @@ else
 endif
 
 #ouput
-out = dist/$(mode)/tensegrity.out
-
-#interfaces
-uif := $(sort $(shell find -path './ui/*.ui'))
+out = dist/$(mode)/tensegrity-plate.out
 
 #sources
 src := $(sort $(shell find -path './src/*.cpp'))
-
-#qt files
-uig := $(subst ./ui/, build/uic/, $(patsubst %.ui, %.hpp, $(uif)))
 
 #objects
 obj := $(sort $(subst ./src/, build/$(mode)/, $(addsuffix .o, $(basename $(src)))))
@@ -48,26 +33,13 @@ all : $(out)
 run : $(out)
 	@./$(out)
 
-uic : $(uig)
-
-debug : 
-	@gdb $(out) -x gdb.txt
-
 math :
 	@cd ../Math && make -f Makefile m=$m
 
-canvas :
-	@cd ../Canvas && make -f Makefile m=$m
-
-$(out) : math canvas $(uig) $(obj)
+$(out) : math $(obj)
 	@echo 'executable($(mode)): $@'
 	@mkdir -p $(dir $@) && rm -rf $@
-	@$(CXX) -fopenmp -o $(out) -Wl,-rpath,$(qln) $(obj) ../Math/dist/$(mode)/libmath.so ../Canvas/dist/$(mode)/libcanvas.so $(LIBS)
-
-build/uic/%.hpp : ui/%.ui
-	@echo 'uicing($(mode)): $<'
-	@mkdir -p $(dir $@) && rm -rf $@
-	@$(uic) $< -o $@
+	@$(CXX) -fopenmp -o $(out) $(obj) ../Math/dist/$(mode)/libmath.so $(LIBS)
 
 build/$(mode)/%.o : src/%.cpp build/$(mode)/%.d
 	@echo 'compiling($(mode)): $<'
@@ -86,4 +58,4 @@ clean :
 print-% :
 	@echo $* = $($*)
 
-.PHONY : all run gui fea clean print-%
+.PHONY : all run clean print-%

@@ -8,6 +8,7 @@ class Strain
 public:
 	enum class strain_measure : uint32_t
 	{
+		linear,
 		quadratic,
 		logarithmic
 	};
@@ -17,6 +18,11 @@ public:
 	static double strain_gradient(double, strain_measure);
 
 private:
+	//strains
+	static double linear_strain(double);
+	static double linear_strain_hessian(double);
+	static double linear_strain_gradient(double);
+
 	static double quadratic_strain(double);
 	static double quadratic_strain_hessian(double);
 	static double quadratic_strain_gradient(double);
