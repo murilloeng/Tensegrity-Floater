@@ -15,7 +15,7 @@ public:
 	Tensegrity(void);
 
 	//destructor
-	~Tensegrity(void);
+	virtual ~Tensegrity(void) = default;
 
 	//data
 	uint32_t order(uint32_t);
@@ -23,9 +23,6 @@ public:
 
 	double twist_angle(double);
 	double twist_angle(void) const;
-
-	double rod_thickness(double);
-	double rod_thickness(void) const;
 
 	double yield_stress(double);
 	double yield_stress(void) const;
@@ -36,12 +33,6 @@ public:
 	double height_center(double);
 	double height_center(void) const;
 
-	double plate_diameter(double);
-	double plate_diameter(void) const;
-
-	double plate_thickness(double);
-	double plate_thickness(void) const;
-
 	double cables_diameter(double);
 	double cables_diameter(void) const;
 
@@ -51,8 +42,19 @@ public:
 	double elastic_modulus(double);
 	double elastic_modulus(void) const;
 
+	math::solvers::Newmark& solver_dynamic(void);
+	math::solvers::NewtonRaphson& solver_static(void);
+
 	Strain::strain_measure strain_measure(void) const;
 	Strain::strain_measure strain_measure(Strain::strain_measure);
+
+	//solve
+	void solve_static(void);
+	void solve_dynamic(void);
+
+protected:
+	//analysis
+	void setup(void);
 
 	//formulation
 	void inertia(double*) const;
@@ -66,10 +68,11 @@ public:
 	double potential_energy(void) const;
 
 	double cable_force(uint32_t) const;
+	double cable_energy(uint32_t) const;
 	double cable_stiffness(uint32_t) const;
-	void cable_position(double*, uint32_t, uint32_t) const;
 
-private:
+	virtual void cable_position(double*, uint32_t, bool, bool) const = 0;
+
 	//data
 	uint32_t m_order;
 	bool m_inelastic;
@@ -77,9 +80,6 @@ private:
 	double m_yield_stress;
 	double m_height_total;
 	double m_height_center;
-	double m_rod_thickness;
-	double m_plate_diameter;
-	double m_plate_thickness;
 	double m_cables_diameter;
 	double m_residual_stress;
 	double m_elastic_modulus;
