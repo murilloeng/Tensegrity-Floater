@@ -18,14 +18,8 @@ public:
 	~Tensegrity(void);
 
 	//data
-	double tension(double);
-	double tension(void) const;
-
 	uint32_t order(uint32_t);
 	uint32_t order(void) const;
-
-	double rod_length(double);
-	double rod_length(void) const;
 
 	double twist_angle(double);
 	double twist_angle(void) const;
@@ -73,12 +67,12 @@ public:
 
 	double cable_force(uint32_t) const;
 	double cable_stiffness(uint32_t) const;
+	void cable_position(double*, uint32_t, uint32_t) const;
 
 private:
 	//data
 	uint32_t m_order;
 	bool m_inelastic;
-	double m_rod_length;
 	double m_twist_angle;
 	double m_yield_stress;
 	double m_height_total;

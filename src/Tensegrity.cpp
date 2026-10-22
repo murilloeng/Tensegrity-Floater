@@ -6,8 +6,8 @@
 
 //constructors
 Tensegrity::Tensegrity(void) : 
-	m_order{3}, m_inelastic{false}, m_rod_length{5.00e-02}, m_twist_angle{0}, m_yield_stress{4.00e+08}, m_height_total{3.20e-01}, 
-	m_height_center{1.40e-01}, m_rod_thickness{1.00e-02},m_plate_diameter{2.80e-01}, m_plate_thickness{5.00e-03}, m_cables_diameter{1.50e-03},
+	m_order{3}, m_inelastic{false}, m_twist_angle{0}, m_yield_stress{4.00e+08}, m_height_total{3.00e-01}, 
+	m_height_center{1.50e-01}, m_rod_thickness{1.00e-02},m_plate_diameter{2.80e-01}, m_plate_thickness{5.00e-03}, m_cables_diameter{1.50e-03},
 	m_residual_stress{2.00e+08}, m_elastic_modulus{2.00e+11}, m_strain_measure{Strain::strain_measure::quadratic}
 {
 	return;
@@ -20,19 +20,6 @@ Tensegrity::~Tensegrity(void)
 }
 
 //data
-double Tensegrity::tension(double fr)
-{
-	const double dc = m_cables_diameter;
-	m_residual_stress = fr / (M_PI_4 * dc * dc);
-	return fr;
-}
-double Tensegrity::tension(void) const
-{
-	const double dc = m_cables_diameter;
-	const double sr = m_residual_stress;
-	return sr * M_PI_4 * dc * dc;
-}
-
 uint32_t Tensegrity::order(void) const
 {
 	return m_order;
@@ -40,15 +27,6 @@ uint32_t Tensegrity::order(void) const
 uint32_t Tensegrity::order(uint32_t order)
 {
 	return m_order = order;
-}
-
-double Tensegrity::rod_length(void) const
-{
-	return m_rod_length;
-}
-double Tensegrity::rod_length(double rod_length)
-{
-	return m_rod_length = rod_length;
 }
 
 double Tensegrity::rod_thickness(void) const
@@ -193,4 +171,8 @@ double Tensegrity::cable_force(uint32_t index) const
 double Tensegrity::cable_stiffness(uint32_t index) const
 {
 	return 0;
+}
+void Tensegrity::cable_position(double* z, uint32_t cable_index, uint32_t node_index) const
+{
+	return;
 }
