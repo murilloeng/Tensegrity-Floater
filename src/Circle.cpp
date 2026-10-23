@@ -2,7 +2,7 @@
 #include <cmath>
 
 //Tensegrity
-#include "Tensegrity-Plate/inc/Circle.hpp"
+#include "Tensegrity-Floater/inc/Circle.hpp"
 
 //constructor
 Circle::Circle(void) : m_radius{1.50e-01}

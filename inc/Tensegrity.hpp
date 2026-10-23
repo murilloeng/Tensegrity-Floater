@@ -6,7 +6,7 @@
 #include "Math/inc/Solvers/NewtonRaphson.hpp"
 
 //Tensegrity
-#include "Tensegrity-Plate/inc/Strain.hpp"
+#include "Tensegrity-Floater/inc/Strain.hpp"
 
 class Tensegrity
 {

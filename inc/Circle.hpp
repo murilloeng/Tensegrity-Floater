@@ -1,7 +1,7 @@
 #pragma once
 
 //Tensegrity
-#include "Tensegrity-Plate/inc/Tensegrity.hpp"
+#include "Tensegrity-Floater/inc/Tensegrity.hpp"
 
 class Circle : public Tensegrity
 {

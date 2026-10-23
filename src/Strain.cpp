@@ -2,7 +2,7 @@
 #include <cmath>
 
 //Tensegrity
-#include "Tensegrity-Plate/inc/Strain.hpp"
+#include "Tensegrity-Floater/inc/Strain.hpp"
 
 double Strain::strain(double s, strain_measure measure)
 {

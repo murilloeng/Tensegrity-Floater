@@ -5,7 +5,7 @@
 #include "Math/inc/Linear/Vec3.hpp"
 
 //Tensegrity
-#include "Tensegrity-Plate/inc/Tensegrity.hpp"
+#include "Tensegrity-Floater/inc/Tensegrity.hpp"
 
 //constructors
 Tensegrity::Tensegrity(void) : 
