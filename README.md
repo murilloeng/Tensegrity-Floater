@@ -1,3 +1,3 @@
 # Tensegrity Plate
 
-Repository to work on the tensegrity plate mechanics.
+Repository to work on the tensegrity floater mechanics.
