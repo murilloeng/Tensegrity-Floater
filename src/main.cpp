@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 //Tensegrity
-#include "Tensegrity-Plate/inc/Tensegrity.hpp"
+#include "Tensegrity-Floater/inc/Tensegrity.hpp"
 
 int main(void)
 {
