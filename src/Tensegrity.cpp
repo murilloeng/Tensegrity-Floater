@@ -139,6 +139,7 @@ void Tensegrity::stiffness(double* K) const
 	A.span(0, 3).eye();
 	//stiffness
 	math::Matrix(K, 6, 6).zeros();
+	math::Vector f(6, math::mode::zeros);
 	for(uint32_t k = 0; k <= m_order; k++)
 	{
 		//positions
@@ -152,13 +153,15 @@ void Tensegrity::stiffness(double* K) const
 		//stiffness
 		tk = (x2 - x1).unit();
 		Nk.span(0, 3) = -(z2 - zr).spin();
+		f += fk * Nk.transpose() * Rr.transpose() * tk;
 		math::Matrix(K, 6, 6) += fk * Nk.transpose() * Rr.transpose() * tk.spin() * Rr * A;
 		math::Matrix(K, 6, 6) += Kk * Nk.transpose() * Rr.transpose() * tk.outer(tk) * Rr * Nk;
 		math::Matrix(K, 6, 6) += fk * Nk.transpose() * Rr.transpose() * (I - tk.outer(tk)) * Rr * Nk / Lk;
 	}
 	//parametrization
 	const math::Matrix Jr = pr.jacobian();
-	math::Matrix(K, 6, 6) = Jr.transpose() * math::Matrix(K, 6, 6) * Jr;
+	const math::Matrix Gr = pr.jacobian_gradient(f);
+	math::Matrix(K, 6, 6) = Jr.transpose() * math::Matrix(K, 6, 6) * Jr + Gr;
 }
 
 void Tensegrity::internal_force(double* fi) const
