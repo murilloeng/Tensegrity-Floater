@@ -15,7 +15,7 @@ else
 endif
 
 #ouput
-out = dist/$(mode)/tensegrity-plate.out
+out = dist/$(mode)/tensegrity-floater.out
 
 #sources
 src := $(sort $(shell find -path './src/*.cpp'))
@@ -34,7 +34,7 @@ run : $(out)
 	@./$(out)
 
 math :
-	@cd ../Math && make -f Makefile m=$m
+	@cd ../Math && make -f Makefile lib m=$m
 
 $(out) : math $(obj)
 	@echo 'executable($(mode)): $@'

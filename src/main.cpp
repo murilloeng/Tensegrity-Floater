@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
-//Tensegrity
+//Floater
 #include "Tensegrity-Floater/inc/Tensegrity.hpp"
 
 int main(void)

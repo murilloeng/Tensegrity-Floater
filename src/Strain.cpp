@@ -1,7 +1,7 @@
 //std
 #include <cmath>
 
-//Tensegrity
+//Floater
 #include "Tensegrity-Floater/inc/Strain.hpp"
 
 double Strain::strain(double s, strain_measure measure)

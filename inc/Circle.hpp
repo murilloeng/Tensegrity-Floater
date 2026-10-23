@@ -1,6 +1,6 @@
 #pragma once
 
-//Tensegrity
+//Floater
 #include "Tensegrity-Floater/inc/Tensegrity.hpp"
 
 class Circle : public Tensegrity

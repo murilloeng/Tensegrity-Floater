@@ -1,7 +1,7 @@
 //std
 #include <cmath>
 
-//Tensegrity
+//Floater
 #include "Tensegrity-Floater/inc/Circle.hpp"
 
 //constructor
@@ -25,8 +25,8 @@ void Circle::cable_position(double* x, uint32_t index, bool layer, bool configur
 {
 	//data
 	const double R = m_radius;
-	const double ht = m_height_total;
-	const double hc = m_height_center;
+	const double ht = m_height_outer;
+	const double hc = m_height_inner;
 	const double ta = m_twist_angle * layer;
 	const double ti = 2 * M_PI * index / m_order;
 	//position
