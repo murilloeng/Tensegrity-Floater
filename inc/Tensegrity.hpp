@@ -1,9 +1,12 @@
 #pragma once
 
 //Math
+#include "Math/inc/Linear/Vec3.hpp"
 #include "Math/inc/Groups/GSE3.hpp"
 
 //Floater
+#include "Tensegrity-Floater/inc/Load.hpp"
+#include "Tensegrity-Floater/inc/Cable.hpp"
 #include "Tensegrity-Floater/inc/Strain.hpp"
 #include "Tensegrity-Floater/inc/SolverStatic.hpp"
 #include "Tensegrity-Floater/inc/SolverDynamic.hpp"
@@ -24,26 +27,24 @@ public:
 	double twist_angle(double);
 	double twist_angle(void) const;
 
-	double yield_stress(double);
-	double yield_stress(void) const;
-
 	double height_inner(double);
 	double height_inner(void) const;
 
 	double height_outer(double);
 	double height_outer(void) const;
 
-	double cables_diameter(double);
-	double cables_diameter(void) const;
-
 	double residual_stress(double);
 	double residual_stress(void) const;
-
-	double elastic_modulus(double);
-	double elastic_modulus(void) const;
-
+	
 	SolverStatic& solver_static(void);
 	SolverDynamic& solver_dynamic(void);
+
+	std::vector<Load>& loads(void);
+	const std::vector<Load>& loads(void) const;
+
+	void create_cables(void);
+	std::vector<Cable>& cables(void);
+	const std::vector<Cable>& cables(void) const;
 
 	Strain::strain_measure strain_measure(void) const;
 	Strain::strain_measure strain_measure(Strain::strain_measure);
@@ -51,38 +52,32 @@ public:
 protected:
 	//analysis
 	void setup(void);
+	void compute_static(double, double*, double*, double*);
 
-	//formulation
-	void inertia(double*) const;
-	void damping(double*) const;
-	void stiffness(double*) const;
-	void internal_force(double*) const;
-	void external_force(double*) const;
-
-	double kinetic_energy(void) const;
-	double internal_energy(void) const;
-	double potential_energy(void) const;
-
-	double cable_force(uint32_t) const;
-	double cable_energy(uint32_t) const;
-	double cable_stiffness(uint32_t) const;
-
-	virtual void cable_position(double*, uint32_t, bool, bool) const = 0;
+	//cables
+	virtual uint32_t cables_count(void) const = 0;
+	virtual math::Vec3 cable_position(uint32_t, bool, bool) const = 0;
 
 	//data
 	uint32_t m_order;
 	bool m_inelastic;
 	double m_twist_angle;
-	double m_yield_stress;
 	double m_height_inner;
 	double m_height_outer;
-	double m_cables_diameter;
 	double m_residual_stress;
-	double m_elastic_modulus;
 
 	math::GSE3 m_state_old;
 	math::GSE3 m_state_new;
+	std::vector<Load> m_loads;
+	std::vector<Cable> m_cables;
 	SolverStatic m_solver_static;
 	SolverDynamic m_solver_dynamic;
 	Strain::strain_measure m_strain_measure;
+
+	//friends
+	friend class Load;
+	friend class Cable;
+	friend class Solver;
+	friend class SolverStatic;
+	friend class SolverDynamic;
 };

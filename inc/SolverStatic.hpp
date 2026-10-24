@@ -3,6 +3,7 @@
 //Math
 #include "Math/inc/Solvers/NewtonRaphson.hpp"
 
+//definitions
 class Tensegrity;
 
 class SolverStatic : public math::solvers::NewtonRaphson
@@ -15,6 +16,9 @@ public:
 	~SolverStatic(void) = default;
 
 private:
+	//solve
+	void setup(void) override;
+
 	//data
 	Tensegrity* m_tensegrity;
 };

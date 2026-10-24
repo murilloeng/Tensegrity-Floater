@@ -21,9 +21,14 @@ double Circle::radius(double radius)
 }
 
 //formulation
-void Circle::cable_position(double* x, uint32_t index, bool layer, bool configuration) const
+uint32_t Circle::cables_count(void) const
+{
+	return m_order + 1;
+}
+math::Vec3 Circle::cable_position(uint32_t index, bool layer, bool configuration) const
 {
 	//data
+	math::Vec3 x;
 	const double R = m_radius;
 	const double ht = m_height_outer;
 	const double hc = m_height_inner;
@@ -33,5 +38,7 @@ void Circle::cable_position(double* x, uint32_t index, bool layer, bool configur
 	x[0] = index == 0 ? 0 : R * cos(ti + ta);
 	x[1] = index == 0 ? 0 : R * sin(ti + ta);
 	x[2] = index != 0 ? layer * ht : (hc + ht) / 2 - layer * hc;
-	if(layer && configuration) x[2] -= ht, math::Vector(x, 3) = m_state_new.action(math::Vector(x, 3));
+	if(layer && configuration) x[2] -= ht, x = m_state_new.action(x);
+	//return
+	return x;
 }
