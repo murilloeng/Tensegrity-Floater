@@ -56,11 +56,15 @@ public:
 	Strain::strain_measure strain_measure(Strain::strain_measure);
 
 	//maps
+	void map_radial(const char*, uint32_t, uint32_t, double);
+	void map_angular(const char*, uint32_t, uint32_t, double);
 	void map_vertical(const char*, uint32_t, uint32_t, double);
 
 protected:
 	//analysis
 	void setup(void);
+	void update(void);
+	void restore(void);
 	void compute_modes(void);
 	void compute_static(double, double*, double*, double*);
 

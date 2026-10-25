@@ -13,6 +13,9 @@
 //Floater
 #include "Tensegrity-Floater/inc/Tensegrity.hpp"
 
+//static
+static const math::solvers::StopCriteria::Type load_max = math::solvers::StopCriteria::Type::LoadLimitMaximum;
+
 //constructors
 Tensegrity::Tensegrity(void) : 
 	m_order{3}, m_inelastic{false}, m_diameter{3.00e-01}, m_twist_angle{0}, m_height_inner{1.50e-01}, m_height_outer{3.00e-01}, 
@@ -128,6 +131,88 @@ Strain::strain_measure Tensegrity::strain_measure(Strain::strain_measure strain_
 }
 
 //maps
+void Tensegrity::map_radial(const char* file_name, uint32_t nr, uint32_t nt, double F)
+{
+	//data
+	m_loads.clear();
+	m_loads.push_back(Load(this));
+	const double R = m_diameter / 2;
+	const double H = m_height_outer;
+	const double& x1 = m_state_new[0];
+	const double& x2 = m_state_new[1];
+	const double& x3 = m_state_new[2];
+	FILE* file = fopen(file_name, "w");
+	if(!file) throw std::runtime_error("Unable to open map file!");
+	//map
+	m_solver_static.silent(true);
+	for(uint32_t i = 0; i <= nr; i++)
+	{
+		for(uint32_t j = 0; j <= nt; j++)
+		{
+			//data
+			const double r = R * i / nr;
+			const double t = 2 * M_PI * j / nt;
+			//load
+			m_loads[0].value(0, F * cos(t));
+			m_loads[0].value(1, F * sin(t));
+			m_loads[0].position(0, r * cos(t));
+			m_loads[0].position(1, r * sin(t));
+			//solve
+			m_solver_static.solve();
+			const math::ASO3 q = m_state_new.gso3().log();
+			const bool status = m_solver_static.status() && m_solver_static.stop_criteria().stop_type() == load_max;
+			//print
+			fprintf(file, "%+.6e %+.6e %d ", r * cos(t), r * sin(t), status);
+			fprintf(file, "%+.6e %+.6e %+.6e %+.6e %+.6e %+.6e\n", x1, x2, x3 - H, q[0], q[1], q[2]);
+			printf("Progress: %.2f\r", double(i * (nt + 1) + j) / (nt + 1) / (nr + 1));
+			fflush(stdout);
+		}
+		fprintf(file, "\n");
+	}
+	//close
+	fclose(file);
+}
+void Tensegrity::map_angular(const char* file_name, uint32_t nr, uint32_t nt, double F)
+{
+	//data
+	m_loads.clear();
+	m_loads.push_back(Load(this));
+	const double R = m_diameter / 2;
+	const double H = m_height_outer;
+	const double& x1 = m_state_new[0];
+	const double& x2 = m_state_new[1];
+	const double& x3 = m_state_new[2];
+	FILE* file = fopen(file_name, "w");
+	if(!file) throw std::runtime_error("Unable to open map file!");
+	//map
+	m_solver_static.silent(true);
+	for(uint32_t i = 0; i <= nr; i++)
+	{
+		for(uint32_t j = 0; j <= nt; j++)
+		{
+			//data
+			const double r = R * i / nr;
+			const double t = 2 * M_PI * j / nt;
+			//load
+			m_loads[0].value(0, -F * sin(t));
+			m_loads[0].value(1, +F * cos(t));
+			m_loads[0].position(0, r * cos(t));
+			m_loads[0].position(1, r * sin(t));
+			//solve
+			m_solver_static.solve();
+			const math::ASO3 q = m_state_new.gso3().log();
+			const bool status = m_solver_static.status() && m_solver_static.stop_criteria().stop_type() == load_max;
+			//print
+			fprintf(file, "%+.6e %+.6e %d ", r * cos(t), r * sin(t), status);
+			fprintf(file, "%+.6e %+.6e %+.6e %+.6e %+.6e %+.6e\n", x1, x2, x3 - H, q[0], q[1], q[2]);
+			printf("Progress: %.2f\r", double(i * (nt + 1) + j) / (nt + 1) / (nr + 1));
+			fflush(stdout);
+		}
+		fprintf(file, "\n");
+	}
+	//close
+	fclose(file);
+}
 void Tensegrity::map_vertical(const char* file_name, uint32_t nr, uint32_t nt, double F)
 {
 	//data
@@ -139,7 +224,7 @@ void Tensegrity::map_vertical(const char* file_name, uint32_t nr, uint32_t nt, d
 	const double& x2 = m_state_new[1];
 	const double& x3 = m_state_new[2];
 	FILE* file = fopen(file_name, "w");
-	if(!file) throw std::runtime_error("Unable to open vertical map file!");
+	if(!file) throw std::runtime_error("Unable to open map file!");
 	//map
 	m_loads[0].value(2, F);
 	m_solver_static.silent(true);
@@ -147,18 +232,21 @@ void Tensegrity::map_vertical(const char* file_name, uint32_t nr, uint32_t nt, d
 	{
 		for(uint32_t j = 0; j <= nt; j++)
 		{
-			//position
+			//data
 			const double r = R * i / nr;
 			const double t = 2 * M_PI * j / nt;
+			//load
 			m_loads[0].position(0, r * cos(t));
 			m_loads[0].position(1, r * sin(t));
 			//solve
 			m_solver_static.solve();
 			const math::ASO3 q = m_state_new.gso3().log();
-			if(m_solver_static.step() != m_solver_static.step_max() + 1) printf("failed!\n");
-			fprintf(file, "%+.6e %+.6e %d ", r * cos(t), r * sin(t), m_solver_static.status());
+			const bool status = m_solver_static.status() && m_solver_static.stop_criteria().stop_type() == load_max;
+			//print
+			fprintf(file, "%+.6e %+.6e %d ", r * cos(t), r * sin(t), status);
 			fprintf(file, "%+.6e %+.6e %+.6e %+.6e %+.6e %+.6e\n", x1, x2, x3 - H, q[0], q[1], q[2]);
-			printf("Progress: %.2f\n", double(i * (nt + 1) + j) / (nt + 1) / (nr + 1));
+			printf("Progress: %.2f\r", double(i * (nt + 1) + j) / (nt + 1) / (nr + 1));
+			fflush(stdout);
 		}
 		fprintf(file, "\n");
 	}
@@ -181,6 +269,16 @@ void Tensegrity::setup(void)
 	}
 	//state
 	m_state_old = m_state_new = math::GSE3(0, 0, m_height_outer);
+}
+void Tensegrity::update(void)
+{
+	m_state_old = m_state_new;
+	for(Cable& cable : m_cables) cable.update();
+}
+void Tensegrity::restore(void)
+{
+	m_state_new = m_state_old;
+	for(Cable& cable : m_cables) cable.restore();
 }
 void Tensegrity::compute_modes(void)
 {

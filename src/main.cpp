@@ -13,9 +13,11 @@ int main(void)
 	{
 		//data
 		Tensegrity tensegrity;
-		tensegrity.order(6);
+		//setup
+		tensegrity.order(3);
 		tensegrity.create_cables();
-		tensegrity.map_vertical("map-vertical.dat", 100, 100, -1e3);
+		//solve
+		tensegrity.map_radial("data/radial/3x1.00e2.dat", 100, 100, 1.00e2);
 	}
 	catch(const std::exception& exception)
 	{

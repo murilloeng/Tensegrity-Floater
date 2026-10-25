@@ -12,6 +12,9 @@
 SolverStatic::SolverStatic(Tensegrity* tensegrity) : m_tensegrity{tensegrity}
 {
 	allocate(6);
+	m_step_max = 1000;
+	m_stop_criteria.load_max(1);
+	m_stop_criteria.add_type(math::solvers::StopCriteria::Type::LoadLimitMaximum);
 	m_system = [this](double* r, double* fr, double* K, double p, const double* x)
 	{
 		//state
@@ -20,11 +23,11 @@ SolverStatic::SolverStatic(Tensegrity* tensegrity) : m_tensegrity{tensegrity}
 		m_tensegrity->compute_static(p, r, fr, K);
 	};
 	m_callback_update = [this](void){
+		m_tensegrity->update();
 		math::Vector(m_x_new,m_size).zeros();
-		m_tensegrity->m_state_old = m_tensegrity->m_state_new;
 	};
 	m_callback_restore = [this](void){
-		m_tensegrity->m_state_new = m_tensegrity->m_state_old;
+		m_tensegrity->restore();
 	};
 }
 
