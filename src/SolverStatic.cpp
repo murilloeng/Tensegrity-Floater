@@ -1,6 +1,3 @@
-//std
-#include <cstdio>
-
 //Math
 #include "Math/inc/Groups/ASE3.hpp"
 
@@ -15,7 +12,7 @@ SolverStatic::SolverStatic(Tensegrity* tensegrity) : m_tensegrity{tensegrity}
 	m_step_max = 1000;
 	m_stop_criteria.load_max(1);
 	m_stop_criteria.add_type(math::solvers::StopCriteria::Type::LoadLimitMaximum);
-	m_system = [this](double* r, double* fr, double* K, double p, const double* x)
+	m_system = [this](double* r, double* fr, double* K, const double* x, double p)
 	{
 		//state
 		m_tensegrity->m_state_new = m_tensegrity->m_state_old * math::ASE3(x).exp();

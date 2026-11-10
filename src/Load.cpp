@@ -1,6 +1,8 @@
 //Math
+#include "Math/inc/Linear/Span.hpp"
 #include "Math/inc/Linear/Vec3.hpp"
 #include "Math/inc/Linear/Mat3.hpp"
+#include "Math/inc/Linear/Matrix.hpp"
 
 //Tensegrity
 #include "Tensegrity-Floater/inc/Load.hpp"
@@ -38,7 +40,7 @@ void Load::compute_static(double p, double& V, double* fr, double* K) const
 	const math::Vec3 fk(m_value);
 	const math::Vec3 zk(m_position[0], m_position[1], 0);
 	const math::Mat3 Rr = m_tensegrity->m_state_new.gso3().matrix();
-	math::Matrix Nk(3, 6, math::mode::eye), Bk(3, 6, math::mode::zeros);
+	math::Matrix Nk(3, 6, math::Mode::eye), Bk(3, 6, math::Mode::zeros);
 	//energy
 	V -= m_tensegrity->m_state_new.action(zk).inner(fk);
 	//force

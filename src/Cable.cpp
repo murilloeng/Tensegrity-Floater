@@ -2,8 +2,10 @@
 #include <cmath>
 
 //Math
+#include "Math/inc/Linear/Span.hpp"
 #include "Math/inc/Linear/Vec3.hpp"
 #include "Math/inc/Linear/Mat3.hpp"
+#include "Math/inc/Linear/Matrix.hpp"
 
 //Tensegrity
 #include "Tensegrity-Floater/inc/Cable.hpp"
@@ -69,14 +71,14 @@ void Cable::compute(double& U, double* fi, double* K) const
 	const double dc = m_diameter;
 	const double Em = m_elastic_modulus;
 	const double sr = m_residual_stress;
-	const math::Mat3 I(math::mode::eye);
+	const math::Mat3 I(math::Mode::eye);
 	const math::Vec3 zr(0, 0, m_tensegrity->m_height_outer);
 	const math::Mat3 Rr = m_tensegrity->m_state_new.gso3().matrix();
 	const math::Vec3 z1 = m_tensegrity->cable_position(m_index, 0, 0);
 	const math::Vec3 z2 = m_tensegrity->cable_position(m_index, 1, 0);
 	const math::Vec3 x1 = m_tensegrity->cable_position(m_index, 0, 1);
 	const math::Vec3 x2 = m_tensegrity->cable_position(m_index, 1, 1);
-	math::Matrix Nc(3, 6, math::mode::eye), Bc(3, 6, math::mode::zeros);
+	math::Matrix Nc(3, 6, math::Mode::eye), Bc(3, 6, math::Mode::zeros);
 	//lengths
 	const double Lr = (z2 - z1).norm();
 	const double Ln = (x2 - x1).norm();

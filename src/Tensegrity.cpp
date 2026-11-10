@@ -5,6 +5,7 @@
 
 //Math
 #include "Math/inc/Eigen/SVD.hpp"
+#include "Math/inc/Linear/Span.hpp"
 #include "Math/inc/Linear/Vec3.hpp"
 #include "Math/inc/Linear/Mat3.hpp"
 #include "Math/inc/Groups/ASO3.hpp"
@@ -286,7 +287,7 @@ void Tensegrity::compute_modes(void)
 	const double cutoff = 1.00e-10;
 	const uint32_t m = m_order + 1;
 	math::Matrix Ae(6, m_order + 1);
-	math::Matrix Nt(6, 3, math::mode::eye);
+	math::Matrix Nt(6, 3, math::Mode::eye);
 	const math::Vec3 zr(0, 0, m_height_outer);
 	const uint32_t n = std::min(6U, m_order + 1);
 	//equilibrium
