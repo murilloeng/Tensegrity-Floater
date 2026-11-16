@@ -3,6 +3,9 @@
 //std
 #include <cstdint>
 
+//Math
+#include "Math/inc/Linear/Matrix.hpp"
+
 //definitions
 class Tensegrity;
 
@@ -32,7 +35,7 @@ private:
 	//analysis
 	void update(void);
 	void restore(void);
-	void compute(double&, double*, double*) const;
+	void compute(double&, math::Vec6&, math::Mat6&) const;
 
 	//data
 	uint32_t m_index;

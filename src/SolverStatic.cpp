@@ -1,5 +1,6 @@
 //Math
 #include "Math/inc/Groups/ASE3.hpp"
+#include "Math/inc/Linear/VectorN.hpp"
 
 //Floater
 #include "Tensegrity-Floater/inc/Tensegrity.hpp"
@@ -21,7 +22,7 @@ SolverStatic::SolverStatic(Tensegrity* tensegrity) : m_tensegrity{tensegrity}
 	};
 	m_callback_update = [this](void){
 		m_tensegrity->update();
-		math::Vector(m_x_new,m_size).zeros();
+		math::VectorN(m_x_new,m_size).zeros();
 	};
 	m_callback_restore = [this](void){
 		m_tensegrity->restore();
@@ -33,6 +34,6 @@ void SolverStatic::setup(void)
 {
 	m_p_old = 0;
 	m_tensegrity->setup();
-	math::Vector(m_x_old, m_size).zeros();
+	math::VectorN(m_x_old, m_size).zeros();
 	math::solvers::NewtonRaphson::setup();
 }

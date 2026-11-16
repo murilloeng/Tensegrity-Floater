@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <functional>
 
+//Math
+#include "Math/inc/Linear/Matrix.hpp"
+
 //definitions
 class Tensegrity;
 
@@ -25,7 +28,7 @@ public:
 
 private:
 	//analysis
-	void compute_static(double, double&, double*, double*) const;
+	void compute_static(double, double&, math::Vec6&, math::Mat6&) const;
 
 	//data
 	double m_value[3];

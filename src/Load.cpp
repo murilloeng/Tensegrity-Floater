@@ -1,7 +1,4 @@
 //Math
-#include "Math/inc/Linear/Span.hpp"
-#include "Math/inc/Linear/Vec3.hpp"
-#include "Math/inc/Linear/Mat3.hpp"
 #include "Math/inc/Linear/Matrix.hpp"
 
 //Tensegrity
@@ -34,19 +31,19 @@ double Load::position(uint32_t index, double position)
 }
 
 //analysis
-void Load::compute_static(double p, double& V, double* fr, double* K) const
+void Load::compute_static(double p, double& V, math::Vec6& fr, math::Mat6& K) const
 {
 	//data
 	const math::Vec3 fk(m_value);
 	const math::Vec3 zk(m_position[0], m_position[1], 0);
 	const math::Mat3 Rr = m_tensegrity->m_state_new.gso3().matrix();
-	math::Matrix Nk(3, 6, math::Mode::eye), Bk(3, 6, math::Mode::zeros);
+	math::Matrix<3, 6> Nk(math::Mode::eye), Bk(math::Mode::zeros);
 	//energy
 	V -= m_tensegrity->m_state_new.action(zk).inner(fk);
 	//force
-	Nk.span(0, 3) = -zk.spin();
-	math::Vector(fr, 6) += Nk.transpose() * Rr.transpose() * fk;
+	Nk.span<3, 3>(0, 3) = -zk.spin();
+	fr += Nk.transpose() * Rr.transpose() * fk;
 	//stiffness
-	Bk.span(0, 3).eye();
-	math::Matrix(K, 6, 6) -= p * Nk.transpose() * Rr.transpose() * fk.spin() * Rr * Bk;
+	Bk.span<3, 3>(0, 3).eye();
+	K -= p * Nk.transpose() * Rr.transpose() * fk.spin() * Rr * Bk;
 }	

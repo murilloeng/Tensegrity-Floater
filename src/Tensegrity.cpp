@@ -4,12 +4,9 @@
 #include <stdexcept>
 
 //Math
-#include "Math/inc/Eigen/SVD.hpp"
-#include "Math/inc/Linear/Span.hpp"
-#include "Math/inc/Linear/Vec3.hpp"
-#include "Math/inc/Linear/Mat3.hpp"
 #include "Math/inc/Groups/ASO3.hpp"
 #include "Math/inc/Groups/ASE3.hpp"
+#include "Math/inc/Linear/Matrix.hpp"
 
 //Floater
 #include "Tensegrity-Floater/inc/Tensegrity.hpp"
@@ -281,61 +278,29 @@ void Tensegrity::restore(void)
 	m_state_new = m_state_old;
 	for(Cable& cable : m_cables) cable.restore();
 }
-void Tensegrity::compute_modes(void)
-{
-	//data
-	const double cutoff = 1.00e-10;
-	const uint32_t m = m_order + 1;
-	math::Matrix Ae(6, m_order + 1);
-	math::Matrix Nt(6, 3, math::Mode::eye);
-	const math::Vec3 zr(0, 0, m_height_outer);
-	const uint32_t n = std::min(6U, m_order + 1);
-	//equilibrium
-	for(const Cable& cable : m_cables)
-	{
-		//positions
-		const math::Vec3 z1 = cable_position(cable.m_index, 0, 0);
-		const math::Vec3 z2 = cable_position(cable.m_index, 1, 0);
-		//direction
-		Nt.span(3, 0) = (z2 - zr).spin();
-		Ae.span(0, cable.m_index, 6, 1) = Nt * (z2 - z1).unit();
-	}
-	//decomposition
-	uint32_t rank = 0;
-	double U[36], s[n], V[m * m];
-	math::eigen::SVD(Ae.data(), 6, m, s, U, V).compute();
-	for(uint32_t i = 0; i < n; i++) rank += s[i] > cutoff * s[0];
-	//modes
-	m_modes.clear();
-	m_modes_counter = m - rank;
-	for(uint32_t i = rank; i < m; i++)
-	{
-		for(uint32_t j = 0; j < m; j++)
-		{
-			m_modes.push_back(V[i * m + j]);
-		}
-	}
-	//print
-	math::Matrix(m_modes.data(), m, m_modes_counter).print();
-}
-void Tensegrity::compute_static(double p, double* r, double* fr, double* K)
+void Tensegrity::compute_static(double p, double* r, double* f, double* K)
 {
 	//data
 	double U = 0, V = 0;
+	math::Vec6 rm(math::Mode::zeros);
+	math::Vec6 fm(math::Mode::zeros);
+	math::Mat6 Km(math::Mode::zeros);
 	const math::ASE3 ar = (m_state_old.inverse() * m_state_new).log();
 	//compute
-	math::Vector(r, 6).zeros();
-	math::Vector(fr, 6).zeros();
-	math::Matrix(K, 6, 6).zeros();
-	for(const Cable& cable : m_cables) cable.compute(U, r, K);
-	for(const Load& load : m_loads) load.compute_static(p, V, fr, K);
-	for(uint32_t i = 0; i < 6; i++) r[i] = p * fr[i] - r[i];
+	for(const Cable& cable : m_cables) cable.compute(U, rm, Km);
+	for(const Load& load : m_loads) load.compute_static(p, V, fm, Km);
+	//group
+	rm = p * fm - rm;
+	const math::Matrix<6, 6> Jr = ar.jacobian();
+	const math::Matrix<6, 6> Gr = ar.jacobian_gradient(rm);
 	//parametrization
-	const math::Matrix Jr = ar.jacobian();
-	const math::Matrix Gr = ar.jacobian_gradient(math::Vector(r, 6));
-	math::Vector(r, 6) = Jr.transpose() * math::Vector(r, 6);
-	math::Vector(fr, 6) = Jr.transpose() * math::Vector(fr, 6);
-	math::Matrix(K, 6, 6) = Jr.transpose() * math::Matrix(K, 6, 6) * Jr - Gr;
+	rm = Jr.transpose() * rm;
+	fm = Jr.transpose() * fm;
+	Km = Jr.transpose() * Km * Jr - Gr;
+	//write
+	rm.write(r);
+	fm.write(f);
+	Km.write(K);
 }
 
 //positions

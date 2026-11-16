@@ -1,8 +1,8 @@
 #pragma once
 
 //Math
-#include "Math/inc/Linear/Vec3.hpp"
 #include "Math/inc/Groups/GSE3.hpp"
+#include "Math/inc/Linear/Matrix.hpp"
 
 //Floater
 #include "Tensegrity-Floater/inc/Load.hpp"
@@ -65,7 +65,6 @@ protected:
 	void setup(void);
 	void update(void);
 	void restore(void);
-	void compute_modes(void);
 	void compute_static(double, double*, double*, double*);
 
 	//positions
@@ -79,13 +78,11 @@ protected:
 	double m_height_inner;
 	double m_height_outer;
 	double m_residual_stress;
-	uint32_t m_modes_counter;
 
 	math::GSE3 m_state_old;
 	math::GSE3 m_state_new;
 	std::vector<Load> m_loads;
 	std::vector<Cable> m_cables;
-	std::vector<double> m_modes;
 	SolverStatic m_solver_static;
 	SolverDynamic m_solver_dynamic;
 	Strain::strain_measure m_strain_measure;

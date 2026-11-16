@@ -2,9 +2,6 @@
 #include <cmath>
 
 //Math
-#include "Math/inc/Linear/Span.hpp"
-#include "Math/inc/Linear/Vec3.hpp"
-#include "Math/inc/Linear/Mat3.hpp"
 #include "Math/inc/Linear/Matrix.hpp"
 
 //Tensegrity
@@ -65,7 +62,7 @@ void Cable::restore(void)
 {
 	m_plastic_strain_new = m_plastic_strain_old;
 }
-void Cable::compute(double& U, double* fi, double* K) const
+void Cable::compute(double& U, math::Vec6& fi, math::Mat6& K) const
 {
 	//data
 	const double dc = m_diameter;
@@ -78,7 +75,7 @@ void Cable::compute(double& U, double* fi, double* K) const
 	const math::Vec3 z2 = m_tensegrity->cable_position(m_index, 1, 0);
 	const math::Vec3 x1 = m_tensegrity->cable_position(m_index, 0, 1);
 	const math::Vec3 x2 = m_tensegrity->cable_position(m_index, 1, 1);
-	math::Matrix Nc(3, 6, math::Mode::eye), Bc(3, 6, math::Mode::zeros);
+	math::Matrix<3, 6> Nc(math::Mode::eye), Bc(math::Mode::zeros);
 	//lengths
 	const double Lr = (z2 - z1).norm();
 	const double Ln = (x2 - x1).norm();
@@ -91,16 +88,16 @@ void Cable::compute(double& U, double* fi, double* K) const
 	//stress
 	const double Ac = M_PI_4 * dc * dc;
 	const double sn = fmax(Em * en + sr, 0);
+	const double fc = sn * gn * Ac * (Em * en + sr > 0);
+	const double Kc = (Em * gn * gn + sn * hn) * Ac / Lr * (Em * en + sr > 0);
 	//energy
 	U += sn * sn * Ac * Lr / Em / 2;
 	//force
-	Nc.span(0, 3) = -(z2 - zr).spin();
-	const double fc = sn * gn * Ac * (Em * en + sr > 0);
-	math::Vector(fi, 6) += fc * Nc.transpose() * Rr.transpose() * tc;
+	Nc.span<3, 3>(0, 3) = -(z2 - zr).spin();
+	fi += fc * Nc.transpose() * Rr.transpose() * tc;
 	//stiffness
-	Bc.span(0, 3).eye();
-	const double Kc = (Em * gn * gn + sn * hn) * Ac / Lr * (Em * en + sr > 0);
-	math::Matrix(K, 6, 6) += fc * Nc.transpose() * Rr.transpose() * tc.spin() * Rr * Bc;
-	math::Matrix(K, 6, 6) += Kc * Nc.transpose() * Rr.transpose() * tc.outer(tc) * Rr * Nc;
-	math::Matrix(K, 6, 6) += fc * Nc.transpose() * Rr.transpose() * (I - tc.outer(tc)) * Rr * Nc / Ln;
+	Bc.span<3, 3>(0, 3).eye();
+	K += fc * Nc.transpose() * Rr.transpose() * tc.spin() * Rr * Bc;
+	K += Kc * Nc.transpose() * Rr.transpose() * tc.outer(tc) * Rr * Nc;
+	K += fc * Nc.transpose() * Rr.transpose() * (I - tc.outer(tc)) * Rr * Nc / Ln;
 }
